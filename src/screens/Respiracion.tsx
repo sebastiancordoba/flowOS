@@ -24,10 +24,10 @@ export function Respiracion({ onFin }: Props) {
   }, [comenzada, fase])
 
   useEffect(() => {
-    if (!comenzada) return
+    if (!comenzada || restanteMs === 0) return
     const t = setInterval(() => setRestanteMs((r) => Math.max(0, r - 1000)), 1000)
     return () => clearInterval(t)
-  }, [comenzada])
+  }, [comenzada, restanteMs])
 
   useEffect(() => {
     if (comenzada && restanteMs === 0) onFin()
