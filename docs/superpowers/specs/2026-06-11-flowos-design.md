@@ -23,7 +23,7 @@ Cada ejercicio implementa la interfaz común `Exercise` y genera sus trials proc
 
 | # | Ejercicio | Dominio | Mecánica | Ejes de dificultad |
 |---|-----------|---------|----------|--------------------|
-| 1 | Cálculo rápido | Velocidad de procesamiento | Operaciones aritméticas contra reloj (suma, resta, multiplicación) con respuesta numérica o selección múltiple | Magnitud de operandos, tipo de operación, tiempo límite |
+| 1 | Cálculo rápido | Velocidad de procesamiento | Operaciones aritméticas contra reloj (suma, resta, multiplicación) con selección múltiple (4 opciones; funciona igual de bien en móvil y escritorio) | Magnitud de operandos, tipo de operación, tiempo límite |
 | 2 | Stroop | Inhibición | Palabra de color pintada en tinta de otro color; el usuario responde el color de la tinta | Proporción de trials incongruentes, tiempo límite |
 | 3 | N-back | Memoria de trabajo | Secuencia de estímulos (letras/figuras); ¿el actual es igual al de hace N posiciones? | N (empieza en 1), velocidad de presentación |
 | 4 | Atención sostenida (SART) | Vigilancia | Aparecen dígitos; responder a todos EXCEPTO al objetivo (ej. el 3) | Frecuencia del objetivo, ritmo de presentación |
