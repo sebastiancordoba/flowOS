@@ -18,11 +18,18 @@ describe('sart.generar', () => {
     for (let i = 0; i < 1000; i++) {
       if (sart.generar(5, rng, []).estimulo.texto === String(OBJETIVO_SART)) objetivos++
     }
-    expect(objetivos).toBeGreaterThan(120)
-    expect(objetivos).toBeLessThan(280)
+    expect(objetivos).toBeGreaterThan(150)
+    expect(objetivos).toBeLessThan(250)
   })
 
   it('tiene un solo botón Tocar', () => {
     expect(sart.generar(1, mulberry32(1), []).opciones).toEqual(['Tocar'])
+  })
+
+  it('el tiempo límite decrece estrictamente del nivel 1 al 10', () => {
+    const rng = mulberry32(1)
+    const tiempos: number[] = []
+    for (let nivel = 1; nivel <= 10; nivel++) tiempos.push(sart.generar(nivel, rng, []).tiempoLimiteMs)
+    for (let i = 1; i < tiempos.length; i++) expect(tiempos[i]).toBeLessThan(tiempos[i - 1])
   })
 })
