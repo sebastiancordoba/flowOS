@@ -1,0 +1,148 @@
+:root {
+  --fondo: #0f1117;
+  --panel: #1a1d27;
+  --texto: #e8eaf0;
+  --texto-suave: #9aa0b0;
+  --acento: #5b7cfa;
+  --acierto: #30a46c;
+  --error: #e5484d;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  min-height: 100dvh;
+}
+
+#root { min-height: 100dvh; }
+
+.pantalla {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  padding: 24px 20px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  text-align: center;
+}
+
+h1 { font-size: 2.4rem; margin: 0; letter-spacing: -0.02em; }
+h2 { font-size: 1.6rem; margin: 0; }
+h3 { margin: 12px 0 4px; }
+
+.subtitulo { color: var(--texto-suave); margin: 0; }
+
+button {
+  font: inherit;
+  color: var(--texto);
+  background: var(--panel);
+  border: 1px solid #2a2e3d;
+  border-radius: 14px;
+  padding: 14px 22px;
+  min-width: 200px;
+  cursor: pointer;
+  transition: transform 0.06s ease, background 0.15s ease;
+}
+button:active { transform: scale(0.97); }
+
+button.principal {
+  background: var(--acento);
+  border-color: var(--acento);
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+button.enlace {
+  background: none;
+  border: none;
+  min-width: 0;
+  color: var(--texto-suave);
+  text-decoration: underline;
+  padding: 8px;
+}
+
+nav { display: flex; gap: 8px; }
+
+.aviso {
+  background: #3b2326;
+  border: 1px solid var(--error);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+}
+
+.racha { font-size: 1.1rem; margin: 0; }
+.grande { font-size: 1.8rem; font-weight: 700; margin: 0; }
+.cierre { color: var(--texto-suave); }
+
+.hud {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  color: var(--texto-suave);
+  font-size: 0.85rem;
+}
+
+.descripcion { color: var(--texto-suave); min-height: 2.4em; margin: 0; }
+
+.trial {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+  border-radius: 18px;
+  padding: 24px 12px;
+  border: 2px solid transparent;
+}
+.trial.acierto { border-color: var(--acierto); }
+.trial.error { border-color: var(--error); }
+
+.regla {
+  color: var(--texto-suave);
+  font-size: 1rem;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.estimulo {
+  font-size: 4rem;
+  font-weight: 800;
+  margin: 0;
+  min-height: 1.2em;
+}
+
+.opciones {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  width: 100%;
+}
+.opciones button { min-width: 0; font-size: 1.1rem; padding: 18px 8px; }
+.opciones button:only-child { grid-column: 1 / -1; }
+
+ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+
+.circulo {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: var(--acento);
+  opacity: 0.85;
+  transition: transform 4s ease-in-out;
+  transform: scale(0.6);
+}
+.circulo.fase-0 { transform: scale(1); transition-duration: 4s; }   /* inhala */
+.circulo.fase-1 { transform: scale(1); transition-duration: 2s; }   /* sostén */
+.circulo.fase-2 { transform: scale(0.6); transition-duration: 6s; } /* exhala */
+
+.fase { font-size: 1.4rem; font-weight: 600; margin: 0; }
