@@ -29,10 +29,11 @@ export function crearSesion(
   niveles: Partial<Record<IdEjercicio, number>>,
   rng: Rng,
 ): EstadoSesion {
+  if (plan.length === 0) throw new Error('crearSesion: plan vacío')
   const ejercicio = ejercicioPorId(plan[0])
   const escalera: EstadoEscalera = { nivel: niveles[plan[0]] ?? 1, aciertosSeguidos: 0 }
   return {
-    plan,
+    plan: [...plan],
     niveles: { ...niveles },
     bloque: 0,
     trial: ejercicio.generar(escalera.nivel, rng, []),

@@ -16,6 +16,10 @@ describe('crearSesion', () => {
     const s = crearSesion(['stroop'], {}, mulberry32(1))
     expect(s.escalera.nivel).toBe(1)
   })
+
+  it('lanza con un plan vacío', () => {
+    expect(() => crearSesion([], {}, mulberry32(1))).toThrow('plan vacío')
+  })
 })
 
 describe('responder', () => {
@@ -73,5 +77,30 @@ describe('responder', () => {
     let s = crearSesion(['calculo'], {}, rng)
     s = responder(s, s.trial!.correcta, DURACION_BLOQUE_MS, rng)
     expect(responder(s, 'x', 0, rng)).toBe(s)
+  })
+
+  it('no muta el estado anterior', () => {
+    const rng = mulberry32(42)
+    const s0 = crearSesion(['calculo'], {}, rng)
+    const copia = JSON.parse(JSON.stringify(s0))
+    responder(s0, s0.trial!.correcta, 1000, rng)
+    expect(JSON.parse(JSON.stringify(s0))).toEqual(copia)
+  })
+
+  it('n-atrás recibe el historial presentado, incluido el trial recién respondido', () => {
+    // contrato crítico: generar(k+1) ve t0..tk; correcta = comparación con N atrás
+    const rng = mulberry32(9)
+    let s = crearSesion(['nback'], { nback: 4 }, rng) // nivel 4 → N=2
+    const presentados: string[] = []
+    for (let i = 0; i < 200 && !s.terminada; i++) {
+      const trial = s.trial!
+      presentados.push(trial.estimulo.texto)
+      const n = trial.estimulo.regla === '1 atrás' ? 1 : trial.estimulo.regla === '2 atrás' ? 2 : 3
+      const idx = presentados.length - 1 - n
+      const esperada = idx >= 0 && presentados[idx] === trial.estimulo.texto ? 'Igual' : 'Distinto'
+      expect(trial.correcta).toBe(esperada)
+      s = responder(s, trial.correcta, 1000, rng)
+    }
+    expect(presentados.length).toBeGreaterThan(50)
   })
 })
