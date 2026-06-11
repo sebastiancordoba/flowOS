@@ -17,12 +17,21 @@ describe('avanzarEscalera (3-arriba-1-abajo)', () => {
   })
 
   it('no baja de nivel 1', () => {
-    expect(avanzarEscalera({ nivel: 1, aciertosSeguidos: 0 }, false, 10).nivel).toBe(1)
+    expect(avanzarEscalera({ nivel: 1, aciertosSeguidos: 0 }, false, 10)).toEqual({
+      nivel: 1,
+      aciertosSeguidos: 0,
+    })
   })
 
   it('no sube más allá de nivelMax', () => {
     let e = { nivel: 10, aciertosSeguidos: 2 }
     e = avanzarEscalera(e, true, 10)
     expect(e.nivel).toBe(10)
+    expect(e.aciertosSeguidos).toBe(0)
+  })
+
+  it('un nivelMax inválido (<1) no puede producir nivel 0', () => {
+    const e = avanzarEscalera({ nivel: 1, aciertosSeguidos: 2 }, true, 0)
+    expect(e.nivel).toBe(1)
   })
 })

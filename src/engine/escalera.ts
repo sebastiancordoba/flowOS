@@ -16,7 +16,7 @@ export function avanzarEscalera(
   }
   const seguidos = estado.aciertosSeguidos + 1
   if (seguidos >= ACIERTOS_PARA_SUBIR) {
-    return { nivel: Math.min(nivelMax, estado.nivel + 1), aciertosSeguidos: 0 }
+    return { nivel: Math.min(Math.max(1, nivelMax), estado.nivel + 1), aciertosSeguidos: 0 }
   }
   return { nivel: estado.nivel, aciertosSeguidos: seguidos }
 }
