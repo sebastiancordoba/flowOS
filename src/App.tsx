@@ -25,6 +25,7 @@ export default function App() {
   const [carga] = useState(() => cargarEstado())
   const [estado, setEstado] = useState<EstadoApp>(carga.estado)
   const [pantalla, setPantalla] = useState<Pantalla>({ id: 'inicio' })
+  const [hoy] = useState(() => fechaLocal(new Date()))
 
   useEffect(() => {
     guardarEstado(estado)
@@ -52,6 +53,7 @@ export default function App() {
         <Inicio
           estado={estado}
           avisoRecuperado={carga.recuperado}
+          hoy={hoy}
           onRutina={() =>
             setPantalla({ id: 'sesion', plan: planRutina(Math.random), tipo: 'rutina' })
           }
@@ -92,6 +94,7 @@ export default function App() {
       return (
         <Estadisticas
           estado={estado}
+          hoy={hoy}
           onImportar={(importado) => {
             setEstado(importado)
             setPantalla({ id: 'inicio' })

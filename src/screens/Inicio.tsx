@@ -1,16 +1,19 @@
+import { rachaVigente } from '../engine/racha'
 import type { EstadoApp } from '../storage/estado'
 
 interface Props {
   estado: EstadoApp
   avisoRecuperado: boolean
+  hoy: string
   onRutina: () => void
   onLibre: () => void
   onStats: () => void
   onPorQue: () => void
 }
 
-export function Inicio({ estado, avisoRecuperado, onRutina, onLibre, onStats, onPorQue }: Props) {
-  const dias = estado.racha.actual === 1 ? 'día' : 'días'
+export function Inicio({ estado, avisoRecuperado, hoy, onRutina, onLibre, onStats, onPorQue }: Props) {
+  const racha = rachaVigente(estado.racha, hoy)
+  const dias = racha === 1 ? 'día' : 'días'
   return (
     <main className="pantalla inicio">
       {avisoRecuperado && (
@@ -21,9 +24,9 @@ export function Inicio({ estado, avisoRecuperado, onRutina, onLibre, onStats, on
       )}
       <h1>flowOS</h1>
       <p className="subtitulo">Enciende el cerebro antes de tocar el teléfono.</p>
-      {estado.racha.actual > 0 && (
+      {racha > 0 && (
         <p className="racha">
-          🔥 Racha: {estado.racha.actual} {dias}
+          🔥 Racha: {racha} {dias}
         </p>
       )}
       <button className="principal" onClick={onRutina}>

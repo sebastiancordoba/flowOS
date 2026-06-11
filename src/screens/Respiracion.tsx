@@ -37,7 +37,7 @@ export function Respiracion({ onFin }: Props) {
   if (!comenzada) {
     return (
       <main className="pantalla respiracion">
-        <h2>Cierre opcional</h2>
+        <h2>Respiración guiada</h2>
         <p className="subtitulo">
           3 minutos de respiración guiada. Es la parte con mejor evidencia de toda la app.
         </p>

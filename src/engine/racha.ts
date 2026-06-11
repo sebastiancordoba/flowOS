@@ -11,6 +11,17 @@ export function fechaLocal(d: Date): string {
   return `${y}-${m}-${dia}`
 }
 
+/**
+ * Racha que tiene sentido mostrar hoy: la actual si la última rutina fue hoy
+ * o ayer (todavía continuable); 0 si ya se rompió.
+ */
+export function rachaVigente(racha: Racha, hoy: string): number {
+  if (racha.ultimaFecha === null) return 0
+  if (racha.ultimaFecha === hoy) return racha.actual
+  const ayer = fechaLocal(new Date(new Date(`${hoy}T12:00:00`).getTime() - 86_400_000))
+  return racha.ultimaFecha === ayer ? racha.actual : 0
+}
+
 /** Registra la rutina completada en la fecha local `hoy` (YYYY-MM-DD). */
 export function registrarRutina(racha: Racha, hoy: string): Racha {
   if (racha.ultimaFecha === hoy) return { ...racha }

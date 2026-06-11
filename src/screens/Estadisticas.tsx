@@ -1,14 +1,16 @@
 import { useRef, useState } from 'react'
+import { rachaVigente } from '../engine/racha'
 import { exportarEstado, importarEstado, type EstadoApp } from '../storage/estado'
 import { EJERCICIOS } from '../engine/ejercicios'
 
 interface Props {
   estado: EstadoApp
+  hoy: string
   onImportar: (estado: EstadoApp) => void
   onVolver: () => void
 }
 
-export function Estadisticas({ estado, onImportar, onVolver }: Props) {
+export function Estadisticas({ estado, hoy, onImportar, onVolver }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [errorImport, setErrorImport] = useState(false)
 
@@ -44,7 +46,7 @@ export function Estadisticas({ estado, onImportar, onVolver }: Props) {
     <main className="pantalla stats">
       <h2>Estadísticas</h2>
       <p>
-        🔥 Racha actual: {estado.racha.actual} · Mejor: {estado.racha.mejor}
+        🔥 Racha actual: {rachaVigente(estado.racha, hoy)} · Mejor: {estado.racha.mejor}
       </p>
       <p>
         Rutinas completadas: {rutinas} · Sesiones libres: {estado.sesiones.length - rutinas}
