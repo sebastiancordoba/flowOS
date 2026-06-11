@@ -17,6 +17,7 @@ export function enteroEn(rng: Rng, min: number, max: number): number {
 }
 
 export function elegir<T>(rng: Rng, items: readonly T[]): T {
+  if (items.length === 0) throw new Error('elegir: arreglo vacío')
   return items[Math.floor(rng() * items.length)]
 }
 

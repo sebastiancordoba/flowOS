@@ -38,7 +38,7 @@ describe('mezclar', () => {
   it('conserva los mismos elementos', () => {
     const rng = mulberry32(3)
     const resultado = mezclar(rng, [1, 2, 3, 4, 5])
-    expect([...resultado].sort()).toEqual([1, 2, 3, 4, 5])
+    expect([...resultado].sort((a, b) => a - b)).toEqual([1, 2, 3, 4, 5])
   })
 
   it('no muta el arreglo original', () => {
@@ -54,5 +54,9 @@ describe('elegir', () => {
     for (let i = 0; i < 100; i++) {
       expect(['a', 'b', 'c']).toContain(elegir(rng, ['a', 'b', 'c']))
     }
+  })
+
+  it('lanza error con un arreglo vacío', () => {
+    expect(() => elegir(mulberry32(1), [])).toThrow('elegir: arreglo vacío')
   })
 })
