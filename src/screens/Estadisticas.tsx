@@ -18,17 +18,23 @@ export function Estadisticas({ estado, onImportar, onVolver }: Props) {
     const a = document.createElement('a')
     a.href = url
     a.download = 'flowos-respaldo.json'
+    document.body.appendChild(a)
     a.click()
+    document.body.removeChild(a)
     URL.revokeObjectURL(url)
   }
 
   async function manejarArchivo(archivo: File) {
-    const texto = await archivo.text()
-    const importado = importarEstado(texto)
-    if (importado) {
-      setErrorImport(false)
-      onImportar(importado)
-    } else {
+    try {
+      const texto = await archivo.text()
+      const importado = importarEstado(texto)
+      if (importado) {
+        setErrorImport(false)
+        onImportar(importado)
+      } else {
+        setErrorImport(true)
+      }
+    } catch {
       setErrorImport(true)
     }
   }
@@ -64,6 +70,7 @@ export function Estadisticas({ estado, onImportar, onVolver }: Props) {
         hidden
         onChange={(ev) => {
           const archivo = ev.target.files?.[0]
+          ev.target.value = ''
           if (archivo) void manejarArchivo(archivo)
         }}
       />
