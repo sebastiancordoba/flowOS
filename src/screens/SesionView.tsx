@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import type { IdEjercicio, Rng } from '../engine/types'
+import type { IdEjercicio } from '../engine/types'
 import { crearSesion, responder, type EstadoSesion, type ResultadoBloque } from '../engine/sesion'
 import { ejercicioPorId } from '../engine/ejercicios'
 import { TrialView } from '../components/TrialView'
@@ -14,17 +14,21 @@ interface Props {
 }
 
 export function SesionView({ plan, niveles, onFin }: Props) {
-  const rngRef = useRef<Rng>(Math.random)
   const [sesion, setSesion] = useState<EstadoSesion>(() =>
-    crearSesion(plan, niveles, rngRef.current),
+    crearSesion(plan, niveles, Math.random),
   )
-  const inicioBloque = useRef(Date.now())
+  const inicioBloque = useRef(0)
   const [feedback, setFeedback] = useState<'acierto' | 'error' | null>(null)
+
+  // el reloj del bloque arranca al montar (Date.now() es impuro en render)
+  useEffect(() => {
+    inicioBloque.current = Date.now()
+  }, [])
 
   function manejar(respuesta: string) {
     if (sesion.terminada || !sesion.trial) return
     setFeedback(respuesta === sesion.trial.correcta ? 'acierto' : 'error')
-    const nuevo = responder(sesion, respuesta, Date.now() - inicioBloque.current, rngRef.current)
+    const nuevo = responder(sesion, respuesta, Date.now() - inicioBloque.current, Math.random)
     if (nuevo.bloque !== sesion.bloque) inicioBloque.current = Date.now()
     setSesion(nuevo)
   }
