@@ -12,8 +12,8 @@ function generarOperacion(nivel: number, rng: Rng): { texto: string; resultado: 
   } else {
     const max = 5 + nivel * 5
     a = enteroEn(rng, 2, max)
-    b = enteroEn(rng, 2, max)
-    if (op === '-' && b > a) [a, b] = [b, a]
+    // en resta, b < a garantiza resultado >= 1 (nunca 0 ni negativo)
+    b = op === '-' ? enteroEn(rng, 1, a - 1) : enteroEn(rng, 2, max)
   }
   const resultado = op === '+' ? a + b : op === '-' ? a - b : a * b
   return { texto: `${a} ${op} ${b}`, resultado }
@@ -21,10 +21,12 @@ function generarOperacion(nivel: number, rng: Rng): { texto: string; resultado: 
 
 function distractores(resultado: number, rng: Rng): number[] {
   const set = new Set<number>()
-  while (set.size < 3) {
+  // desvio nunca es 0, así que candidato !== resultado siempre; el único guard real es >= 0
+  for (let intentos = 0; set.size < 3; intentos++) {
+    if (intentos > 50) throw new Error('distractores: no se pudo completar el set')
     const desvio = enteroEn(rng, 1, 10) * (rng() < 0.5 ? -1 : 1)
     const candidato = resultado + desvio
-    if (candidato !== resultado && candidato >= 0) set.add(candidato)
+    if (candidato >= 0) set.add(candidato)
   }
   return [...set]
 }

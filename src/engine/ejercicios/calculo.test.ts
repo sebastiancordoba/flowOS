@@ -23,19 +23,24 @@ describe('calculo.generar', () => {
     }
   })
 
-  it('en niveles bajos solo hay suma y resta', () => {
+  it('en niveles 1-2 solo hay suma y resta; desde nivel 3 aparece la multiplicación', () => {
     const rng = mulberry32(7)
     for (let i = 0; i < 100; i++) {
-      const t = calculo.generar(1, rng, [])
-      expect(t.estimulo.texto).not.toContain('×')
+      expect(calculo.generar(1, rng, []).estimulo.texto).not.toContain('×')
+      expect(calculo.generar(2, rng, []).estimulo.texto).not.toContain('×')
     }
+    let multiplicaciones = 0
+    for (let i = 0; i < 100; i++) {
+      if (calculo.generar(3, rng, []).estimulo.texto.includes('×')) multiplicaciones++
+    }
+    expect(multiplicaciones).toBeGreaterThan(0)
   })
 
-  it('el tiempo límite baja al subir el nivel', () => {
+  it('el tiempo límite decrece estrictamente del nivel 1 al 10', () => {
     const rng = mulberry32(1)
-    const facil = calculo.generar(1, rng, [])
-    const dificil = calculo.generar(10, rng, [])
-    expect(dificil.tiempoLimiteMs).toBeLessThan(facil.tiempoLimiteMs)
+    const tiempos: number[] = []
+    for (let nivel = 1; nivel <= 10; nivel++) tiempos.push(calculo.generar(nivel, rng, []).tiempoLimiteMs)
+    for (let i = 1; i < tiempos.length; i++) expect(tiempos[i]).toBeLessThan(tiempos[i - 1])
   })
 
   it('nunca produce resultados negativos en las opciones', () => {
@@ -43,6 +48,14 @@ describe('calculo.generar', () => {
     for (let i = 0; i < 200; i++) {
       const t = calculo.generar(8, rng, [])
       for (const o of t.opciones) expect(Number(o)).toBeGreaterThanOrEqual(0)
+    }
+  })
+
+  it('la resta nunca produce resultado 0', () => {
+    const rng = mulberry32(11)
+    for (let i = 0; i < 300; i++) {
+      const t = calculo.generar(2, rng, [])
+      if (t.estimulo.texto.includes('-')) expect(Number(t.correcta)).toBeGreaterThanOrEqual(1)
     }
   })
 })
