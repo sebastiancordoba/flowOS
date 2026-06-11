@@ -10,6 +10,8 @@ describe('cambio.generar', () => {
     for (let i = 0; i < 300; i++) {
       const t = cambio.generar(5, rng, historial)
       const d = Number(t.estimulo.texto)
+      expect(d).toBeGreaterThanOrEqual(1)
+      expect(d).toBeLessThanOrEqual(9)
       if (t.estimulo.regla === '¿Par o impar?') {
         expect(t.opciones).toEqual(['Par', 'Impar'])
         expect(t.correcta).toBe(d % 2 === 0 ? 'Par' : 'Impar')
@@ -40,5 +42,12 @@ describe('cambio.generar', () => {
       historial = [...historial, t]
     }
     expect(cambios).toBeGreaterThan(40)
+  })
+
+  it('el tiempo límite decrece estrictamente del nivel 1 al 10', () => {
+    const rng = mulberry32(1)
+    const tiempos: number[] = []
+    for (let nivel = 1; nivel <= 10; nivel++) tiempos.push(cambio.generar(nivel, rng, []).tiempoLimiteMs)
+    for (let i = 1; i < tiempos.length; i++) expect(tiempos[i]).toBeLessThan(tiempos[i - 1])
   })
 })
