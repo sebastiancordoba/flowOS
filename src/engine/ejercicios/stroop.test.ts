@@ -26,6 +26,14 @@ describe('stroop.generar', () => {
       const tinta = COLORES.find((c) => c.css === t.estimulo.color)!
       if (tinta.nombre !== t.estimulo.texto) incongruentes++
     }
-    expect(incongruentes).toBeGreaterThan(80)
+    expect(incongruentes).toBeGreaterThan(90)
+    expect(incongruentes).toBeLessThan(150)
+  })
+
+  it('el tiempo límite decrece estrictamente del nivel 1 al 10', () => {
+    const rng = mulberry32(1)
+    const tiempos: number[] = []
+    for (let nivel = 1; nivel <= 10; nivel++) tiempos.push(stroop.generar(nivel, rng, []).tiempoLimiteMs)
+    for (let i = 1; i < tiempos.length; i++) expect(tiempos[i]).toBeLessThan(tiempos[i - 1])
   })
 })

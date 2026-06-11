@@ -3,7 +3,7 @@ import { elegir, mezclar } from '../rng'
 
 export const COLORES = [
   { nombre: 'ROJO', css: '#e5484d' },
-  { nombre: 'AZUL', css: '#3e63dd' },
+  { nombre: 'AZUL', css: '#5172e3' },
   { nombre: 'VERDE', css: '#30a46c' },
   { nombre: 'AMARILLO', css: '#f5d90a' },
 ] as const
@@ -15,7 +15,7 @@ export const stroop: Ejercicio = {
   nivelMax: 10,
   generar(nivel, rng) {
     // a más nivel, más trials incongruentes
-    const probIncongruente = 0.4 + nivel * 0.05
+    const probIncongruente = 0.25 + nivel * 0.065
     const palabra = elegir(rng, COLORES)
     const tinta =
       rng() < probIncongruente
