@@ -23,7 +23,7 @@ export const nback: Ejercicio = {
       estimulo: { texto: letra, regla: `${n} atrás` },
       opciones: ['Igual', 'Distinto'],
       correcta: letra === previa ? 'Igual' : 'Distinto',
-      tiempoLimiteMs: Math.max(1800, 3500 - nivel * 150),
+      tiempoLimiteMs: Math.max(2000, 3500 - nivel * 150),
     }
   },
 }

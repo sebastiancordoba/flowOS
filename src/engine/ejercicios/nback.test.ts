@@ -51,4 +51,9 @@ describe('nback.generar', () => {
   it('muestra la regla N atrás', () => {
     expect(nback.generar(8, mulberry32(1), []).estimulo.regla).toBe('3 atrás')
   })
+
+  it('nivel 4 (N=2) con un solo trial previo da Distinto', () => {
+    const t = nback.generar(4, mulberry32(1), [trialCon('B')])
+    expect(t.correcta).toBe('Distinto')
+  })
 })
