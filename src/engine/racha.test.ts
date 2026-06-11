@@ -51,4 +51,9 @@ describe('registrarRutina', () => {
     const r = { actual: 2, mejor: 2, ultimaFecha: '2026-05-31' }
     expect(registrarRutina(r, '2026-06-01').actual).toBe(3)
   })
+
+  it('maneja el cambio de año', () => {
+    const r = { actual: 4, mejor: 4, ultimaFecha: '2025-12-31' }
+    expect(registrarRutina(r, '2026-01-01').actual).toBe(5)
+  })
 })
