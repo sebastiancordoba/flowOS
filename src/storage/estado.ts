@@ -35,15 +35,28 @@ export interface ResultadoCarga {
 }
 
 export function cargarEstado(storage: StorageMinimo = localStorage): ResultadoCarga {
+  let crudo: string | null = null
   try {
-    const crudo = storage.getItem(CLAVE)
+    crudo = storage.getItem(CLAVE)
     if (crudo === null) return { estado: estadoInicial(), recuperado: false }
     const datos: unknown = JSON.parse(crudo)
-    if (!esEstadoValido(datos)) return { estado: estadoInicial(), recuperado: true }
+    if (!esEstadoValido(datos)) return rescatar(crudo, storage)
     return { estado: datos, recuperado: false }
   } catch {
-    return { estado: estadoInicial(), recuperado: true }
+    return rescatar(crudo, storage)
   }
+}
+
+/** Conserva el blob ilegible en otra clave para un rescate manual por devtools. */
+function rescatar(crudo: string | null, storage: StorageMinimo): ResultadoCarga {
+  if (crudo !== null) {
+    try {
+      storage.setItem(`${CLAVE}-corrupto`, crudo)
+    } catch {
+      // si tampoco se puede guardar el respaldo, no hay nada más que hacer
+    }
+  }
+  return { estado: estadoInicial(), recuperado: true }
 }
 
 export function guardarEstado(estado: EstadoApp, storage: StorageMinimo = localStorage): void {

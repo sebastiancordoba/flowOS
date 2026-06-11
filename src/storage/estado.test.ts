@@ -45,6 +45,12 @@ describe('cargarEstado', () => {
     expect(cargarEstado(storage).estado).toEqual(estado)
   })
 
+  it('conserva el blob corrupto bajo otra clave para rescate manual', () => {
+    const storage = storageFalso({ 'flowos-estado': '{{{' })
+    cargarEstado(storage)
+    expect(storage.getItem('flowos-estado-corrupto')).toBe('{{{')
+  })
+
   it('getItem que lanza devuelve estado inicial y marca recuperado', () => {
     const storage = {
       getItem: () => {
