@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import type { IdEjercicio } from '../types'
 import { EJERCICIOS, ejercicioPorId } from './index'
 
 describe('registro de ejercicios', () => {
@@ -11,5 +12,9 @@ describe('registro de ejercicios', () => {
     for (const e of EJERCICIOS) {
       expect(ejercicioPorId(e.id)).toBe(e)
     }
+  })
+
+  it('lanza al pedir un id desconocido', () => {
+    expect(() => ejercicioPorId('inexistente' as IdEjercicio)).toThrow('Ejercicio desconocido')
   })
 })
