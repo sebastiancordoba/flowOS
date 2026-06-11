@@ -49,8 +49,9 @@ export function cargarEstado(storage: StorageMinimo = localStorage): ResultadoCa
 export function guardarEstado(estado: EstadoApp, storage: StorageMinimo = localStorage): void {
   try {
     storage.setItem(CLAVE, JSON.stringify(estado))
-  } catch {
+  } catch (e) {
     // almacenamiento lleno o bloqueado: la sesión sigue funcionando en memoria
+    console.warn('flowOS: no se pudo guardar el estado', e)
   }
 }
 
@@ -70,10 +71,13 @@ export function importarEstado(json: string): EstadoApp | null {
 function esEstadoValido(d: unknown): d is EstadoApp {
   if (typeof d !== 'object' || d === null) return false
   const e = d as Record<string, unknown>
+  if (e.version !== 1) return false
+  if (typeof e.racha !== 'object' || e.racha === null) return false
+  const r = e.racha as Record<string, unknown>
   return (
-    e.version === 1 &&
-    typeof e.racha === 'object' &&
-    e.racha !== null &&
+    typeof r.actual === 'number' &&
+    typeof r.mejor === 'number' &&
+    (r.ultimaFecha === null || typeof r.ultimaFecha === 'string') &&
     typeof e.niveles === 'object' &&
     e.niveles !== null &&
     Array.isArray(e.sesiones)

@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import {
   cargarEstado,
   estadoInicial,
@@ -16,8 +16,6 @@ function storageFalso(inicial: Record<string, string> = {}) {
 }
 
 describe('cargarEstado', () => {
-  beforeEach(() => localStorage.clear())
-
   it('sin datos devuelve el estado inicial sin marcar recuperación', () => {
     const { estado, recuperado } = cargarEstado(storageFalso())
     expect(estado).toEqual(estadoInicial())
@@ -46,6 +44,18 @@ describe('cargarEstado', () => {
     guardarEstado(estado, storage)
     expect(cargarEstado(storage).estado).toEqual(estado)
   })
+
+  it('getItem que lanza devuelve estado inicial y marca recuperado', () => {
+    const storage = {
+      getItem: () => {
+        throw new Error('SecurityError')
+      },
+      setItem: () => {},
+    }
+    const { estado, recuperado } = cargarEstado(storage)
+    expect(estado).toEqual(estadoInicial())
+    expect(recuperado).toBe(true)
+  })
 })
 
 describe('exportar/importar', () => {
@@ -58,5 +68,9 @@ describe('exportar/importar', () => {
     expect(importarEstado('no es json')).toBeNull()
     expect(importarEstado('{"version":99}')).toBeNull()
     expect(importarEstado('null')).toBeNull()
+  })
+
+  it('una racha sin campos no pasa la validación', () => {
+    expect(importarEstado('{"version":1,"racha":{},"niveles":{},"sesiones":[]}')).toBeNull()
   })
 })
