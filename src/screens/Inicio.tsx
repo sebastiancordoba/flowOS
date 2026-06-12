@@ -7,11 +7,21 @@ interface Props {
   hoy: string
   onRutina: () => void
   onLibre: () => void
+  onLectura: () => void
   onStats: () => void
   onPorQue: () => void
 }
 
-export function Inicio({ estado, avisoRecuperado, hoy, onRutina, onLibre, onStats, onPorQue }: Props) {
+export function Inicio({
+  estado,
+  avisoRecuperado,
+  hoy,
+  onRutina,
+  onLibre,
+  onLectura,
+  onStats,
+  onPorQue,
+}: Props) {
   const racha = rachaVigente(estado.racha, hoy)
   const dias = racha === 1 ? 'día' : 'días'
   return (
@@ -33,6 +43,7 @@ export function Inicio({ estado, avisoRecuperado, hoy, onRutina, onLibre, onStat
         Rutina de la mañana
       </button>
       <button onClick={onLibre}>Sesión libre</button>
+      <button onClick={onLectura}>Lectura enfocada</button>
       <nav>
         <button className="enlace" onClick={onStats}>
           Estadísticas

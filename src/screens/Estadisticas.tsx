@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { rachaVigente } from '../engine/racha'
+import { minutosObjetivo } from '../engine/lectura'
 import { exportarEstado, importarEstado, type EstadoApp } from '../storage/estado'
 import { EJERCICIOS } from '../engine/ejercicios'
 
@@ -42,6 +43,7 @@ export function Estadisticas({ estado, hoy, onImportar, onVolver }: Props) {
   }
 
   const rutinas = estado.sesiones.filter((s) => s.tipo === 'rutina').length
+  const minutosLeidos = estado.lecturas.reduce((s, l) => s + l.minutosLeidos, 0)
   return (
     <main className="pantalla stats">
       <h2>Estadísticas</h2>
@@ -59,6 +61,15 @@ export function Estadisticas({ estado, hoy, onImportar, onVolver }: Props) {
           </li>
         ))}
       </ul>
+      <h3>Lectura</h3>
+      <p>
+        📖 Racha de lectura: {rachaVigente(estado.lectura.racha, hoy)} · Mejor:{' '}
+        {estado.lectura.racha.mejor}
+      </p>
+      <p>
+        Objetivo actual: {minutosObjetivo(estado.lectura.nivel)} min · Sesiones:{' '}
+        {estado.lecturas.length} · Total: {minutosLeidos} min
+      </p>
       <h3>Respaldo</h3>
       <p className="subtitulo">
         Tus datos viven solo en este navegador. Exporta un respaldo de vez en cuando.

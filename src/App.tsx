@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react'
 import type { IdEjercicio } from './engine/types'
 import type { ResultadoBloque } from './engine/sesion'
 import { planRutina } from './engine/rutina'
-import { fechaLocal, registrarRutina } from './engine/racha'
+import { fechaLocal, rachaVigente, registrarRutina } from './engine/racha'
+import { avanzarNivelLectura } from './engine/lectura'
 import { cargarEstado, guardarEstado, type EstadoApp } from './storage/estado'
 import { Inicio } from './screens/Inicio'
 import { SesionView } from './screens/SesionView'
 import { Resumen } from './screens/Resumen'
 import { Respiracion } from './screens/Respiracion'
+import { Lectura } from './screens/Lectura'
 import { SesionLibre } from './screens/SesionLibre'
 import { Estadisticas } from './screens/Estadisticas'
 import { PorQue } from './screens/PorQue'
@@ -17,6 +19,7 @@ type Pantalla =
   | { id: 'sesion'; plan: IdEjercicio[]; tipo: 'rutina' | 'libre' }
   | { id: 'respiracion'; alTerminar: Pantalla }
   | { id: 'resumen'; resultados: ResultadoBloque[]; tipo: 'rutina' | 'libre' }
+  | { id: 'lectura' }
   | { id: 'libre' }
   | { id: 'stats' }
   | { id: 'porque' }
@@ -47,6 +50,18 @@ export default function App() {
     setPantalla(tipo === 'rutina' ? { id: 'respiracion', alTerminar: resumen } : resumen)
   }
 
+  function registrarLectura(objetivoMin: number, minutosLeidos: number) {
+    const hoy = fechaLocal(new Date())
+    setEstado((e) => ({
+      ...e,
+      lectura: {
+        nivel: avanzarNivelLectura(e.lectura.nivel, minutosLeidos),
+        racha: registrarRutina(e.lectura.racha, hoy),
+      },
+      lecturas: [...e.lecturas, { fecha: hoy, objetivoMin, minutosLeidos }],
+    }))
+  }
+
   switch (pantalla.id) {
     case 'inicio':
       return (
@@ -58,6 +73,7 @@ export default function App() {
             setPantalla({ id: 'sesion', plan: planRutina(Math.random), tipo: 'rutina' })
           }
           onLibre={() => setPantalla({ id: 'libre' })}
+          onLectura={() => setPantalla({ id: 'lectura' })}
           onStats={() => setPantalla({ id: 'stats' })}
           onPorQue={() => setPantalla({ id: 'porque' })}
         />
@@ -73,6 +89,15 @@ export default function App() {
       )
     case 'respiracion':
       return <Respiracion onFin={() => setPantalla(pantalla.alTerminar)} />
+    case 'lectura':
+      return (
+        <Lectura
+          nivel={estado.lectura.nivel}
+          racha={rachaVigente(estado.lectura.racha, hoy)}
+          onCompletar={registrarLectura}
+          onVolver={() => setPantalla({ id: 'inicio' })}
+        />
+      )
     case 'resumen':
       return (
         <Resumen

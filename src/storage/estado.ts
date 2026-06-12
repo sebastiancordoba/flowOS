@@ -8,23 +8,44 @@ export interface ResumenSesion {
   resultados: ResultadoBloque[]
 }
 
+export interface EstadoLectura {
+  /** nivel de lectura: determina la duración objetivo propuesta */
+  nivel: number
+  racha: Racha
+}
+
+export interface RegistroLectura {
+  fecha: string // YYYY-MM-DD local
+  objetivoMin: number
+  minutosLeidos: number
+}
+
 export interface EstadoApp {
-  version: 1
+  version: 2
   racha: Racha
   niveles: Partial<Record<IdEjercicio, number>>
   sesiones: ResumenSesion[]
+  lectura: EstadoLectura
+  lecturas: RegistroLectura[]
 }
 
 const CLAVE = 'flowos-estado'
 
 type StorageMinimo = Pick<Storage, 'getItem' | 'setItem'>
+type Crudo = Record<string, unknown>
+
+function rachaInicial(): Racha {
+  return { actual: 0, mejor: 0, ultimaFecha: null }
+}
 
 export function estadoInicial(): EstadoApp {
   return {
-    version: 1,
-    racha: { actual: 0, mejor: 0, ultimaFecha: null },
+    version: 2,
+    racha: rachaInicial(),
     niveles: {},
     sesiones: [],
+    lectura: { nivel: 1, racha: rachaInicial() },
+    lecturas: [],
   }
 }
 
@@ -39,9 +60,9 @@ export function cargarEstado(storage: StorageMinimo = localStorage): ResultadoCa
   try {
     crudo = storage.getItem(CLAVE)
     if (crudo === null) return { estado: estadoInicial(), recuperado: false }
-    const datos: unknown = JSON.parse(crudo)
-    if (!esEstadoValido(datos)) return rescatar(crudo, storage)
-    return { estado: datos, recuperado: false }
+    const migrado = migrar(JSON.parse(crudo))
+    if (migrado === null) return rescatar(crudo, storage)
+    return { estado: migrado, recuperado: false }
   } catch {
     return rescatar(crudo, storage)
   }
@@ -74,25 +95,57 @@ export function exportarEstado(estado: EstadoApp): string {
 
 export function importarEstado(json: string): EstadoApp | null {
   try {
-    const datos: unknown = JSON.parse(json)
-    return esEstadoValido(datos) ? datos : null
+    return migrar(JSON.parse(json))
   } catch {
     return null
   }
 }
 
-function esEstadoValido(d: unknown): d is EstadoApp {
-  if (typeof d !== 'object' || d === null) return false
-  const e = d as Record<string, unknown>
-  if (e.version !== 1) return false
-  if (typeof e.racha !== 'object' || e.racha === null) return false
-  const r = e.racha as Record<string, unknown>
+function esRachaValida(r: unknown): r is Racha {
+  if (typeof r !== 'object' || r === null) return false
+  const x = r as Crudo
   return (
-    typeof r.actual === 'number' &&
-    typeof r.mejor === 'number' &&
-    (r.ultimaFecha === null || typeof r.ultimaFecha === 'string') &&
+    typeof x.actual === 'number' &&
+    typeof x.mejor === 'number' &&
+    (x.ultimaFecha === null || typeof x.ultimaFecha === 'string')
+  )
+}
+
+function esLecturaValida(l: unknown): l is EstadoLectura {
+  if (typeof l !== 'object' || l === null) return false
+  const x = l as Crudo
+  return typeof x.nivel === 'number' && esRachaValida(x.racha)
+}
+
+/** Campos comunes a v1 y v2. */
+function baseValida(e: Crudo): boolean {
+  return (
+    esRachaValida(e.racha) &&
     typeof e.niveles === 'object' &&
     e.niveles !== null &&
     Array.isArray(e.sesiones)
   )
+}
+
+/**
+ * Valida cualquier estado guardado y lo migra a la versión actual.
+ * Devuelve null si es irreconocible (corrupto o versión desconocida).
+ */
+function migrar(datos: unknown): EstadoApp | null {
+  if (typeof datos !== 'object' || datos === null) return null
+  const e = datos as Crudo
+  if (!baseValida(e)) return null
+  const base = {
+    racha: e.racha as Racha,
+    niveles: e.niveles as Partial<Record<IdEjercicio, number>>,
+    sesiones: e.sesiones as ResumenSesion[],
+  }
+  // v1 → v2: añade los campos de lectura con defaults
+  if (e.version === 1) {
+    return { version: 2, ...base, lectura: { nivel: 1, racha: rachaInicial() }, lecturas: [] }
+  }
+  if (e.version === 2 && esLecturaValida(e.lectura) && Array.isArray(e.lecturas)) {
+    return { version: 2, ...base, lectura: e.lectura, lecturas: e.lecturas as RegistroLectura[] }
+  }
+  return null
 }

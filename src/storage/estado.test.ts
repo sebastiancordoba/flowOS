@@ -80,3 +80,52 @@ describe('exportar/importar', () => {
     expect(importarEstado('{"version":1,"racha":{},"niveles":{},"sesiones":[]}')).toBeNull()
   })
 })
+
+describe('migración v1 → v2', () => {
+  const v1 = JSON.stringify({
+    version: 1,
+    racha: { actual: 4, mejor: 9, ultimaFecha: '2026-06-11' },
+    niveles: { calculo: 7 },
+    sesiones: [{ fecha: '2026-06-11', tipo: 'rutina', resultados: [] }],
+  })
+
+  it('un estado v1 guardado se carga migrado a v2 con los campos de lectura por defecto', () => {
+    const { estado, recuperado } = cargarEstado(storageFalso({ 'flowos-estado': v1 }))
+    expect(recuperado).toBe(false)
+    expect(estado.version).toBe(2)
+    // conserva lo de v1
+    expect(estado.racha).toEqual({ actual: 4, mejor: 9, ultimaFecha: '2026-06-11' })
+    expect(estado.niveles).toEqual({ calculo: 7 })
+    expect(estado.sesiones).toHaveLength(1)
+    // añade los defaults de lectura
+    expect(estado.lectura).toEqual({ nivel: 1, racha: { actual: 0, mejor: 0, ultimaFecha: null } })
+    expect(estado.lecturas).toEqual([])
+  })
+
+  it('importar un respaldo v1 también lo migra a v2', () => {
+    const importado = importarEstado(v1)
+    expect(importado?.version).toBe(2)
+    expect(importado?.lectura.nivel).toBe(1)
+  })
+
+  it('un v2 con lectura inválida no pasa la validación', () => {
+    const malo = JSON.stringify({
+      version: 2,
+      racha: { actual: 0, mejor: 0, ultimaFecha: null },
+      niveles: {},
+      sesiones: [],
+      lectura: {},
+      lecturas: [],
+    })
+    expect(importarEstado(malo)).toBeNull()
+  })
+
+  it('un v2 completo hace round-trip fiel', () => {
+    const estado = {
+      ...estadoInicial(),
+      lectura: { nivel: 6, racha: { actual: 3, mejor: 8, ultimaFecha: '2026-06-11' } },
+      lecturas: [{ fecha: '2026-06-11', objetivoMin: 10, minutosLeidos: 10 }],
+    }
+    expect(importarEstado(exportarEstado(estado))).toEqual(estado)
+  })
+})
